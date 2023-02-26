@@ -1,41 +1,122 @@
 @import "~bootstrap/scss/bootstrap";
 
+$primary-color: #191F6C;
+$secondary-color: #B0AFB1;
 
-.App {
-  text-align: center;
+
+.login{
+    background-color: $secondary-color !important;
+    height: 100vh !important;
+    padding-top: 15vh;
+    text-align: center;
+
+    .card{
+        max-width: 500px;
+        margin: 0 auto !important;
+        border-radius: 20px !important;
+
+        .card-title{
+            font-size: 27px !important;
+        }
+
+        .dynamic-spacing{
+            margin: 10px 30px !important;
+            padding: 10px 30px !important;
+
+            @media screen and (max-width:600px){
+                margin: auto !important;
+                padding: auto !important;
+            }
+        }
+    }
+
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.form-control{
+    &:focus{
+        // border: #191F6C !important;
+        // box-shadow: 0 0 0 2px #191f6ccf;
+    }
+
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.btn-primary{
+    background-color: $primary-color !important;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.navbar{
+    background-color: $primary-color;
+    box-shadow: 0 4px 2px -2px rgb(188, 186, 186);
+    .MuiSvgIcon-root{
+        color: #fff;
+        cursor: pointer;
+    }
 }
 
-.App-link {
-  color: #61dafb;
+.logout-btn{
+    color: #fff;
+    cursor: pointer;
+    font-weight: 700;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.add-btn{
+    width: 100px;
 }
+
+.MuiToolbar-regular{
+ min-height: 0 !important;
+}
+
+.MuiPaper-rounded{
+    border-radius: 20px !important;
+}
+
+.MuiTableHead-root{
+    th{
+        font-weight: 700 !important;
+        z-index: unset !important;
+        .MuiTableCell-root{
+            border: 2px solid black !important;
+        }
+    } 
+}
+
+.MuiTableCell-root{
+    padding: auto !important;
+    // height: 30px !important;
+}
+  
+.MuiTableRow-root{
+    td{
+        font-size: 14px !important;
+
+        .MuiIconButton-root{
+            // padding: 5px !important;
+            border-radius: 0 !important;
+            .MuiIcon-root{
+                font-size: 15px !important;
+            }
+            
+        }
+    }
+}
+
+.MuiTable-root{
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif !important;
+}
+
+.form-check-input:checked{
+background-color: $primary-color !important;
+border-color: $primary-color !important;
+}
+
+.scrollable-container{
+    height: 50vh;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+
+

@@ -1,13 +1,15 @@
 import { Route, Routes } from "react-router-dom";
+import Dashboard from "../Pages/Dashboard";
+import TopNav from "./TopNav";
 
 const NavigationRouter = ()=>{
     return (
         <>
+            <TopNav/>
             hello from nav Router
             <Routes>
-            <Route path="/nav1" element={<>nav router 1</>}/>
-                
-            <Route path="/nav2" element={<>nav router 2</>}/>
+                <Route path="/dashboard" element={<Dashboard/>}/>
+                <Route path="/categories" element={<>Caregories</>}/>
             </Routes>
                 
         </>

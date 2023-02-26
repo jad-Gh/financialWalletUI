@@ -1,7 +1,8 @@
 import logo from './logo.svg';
 import './App.scss';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import NavigationRouter from './NavigationRouter';
+import NavigationRouter from './Navigation/NavigationRouter';
+import Login from './Login/Login';
 
 
 function App() {
@@ -9,8 +10,8 @@ function App() {
     <div className="App">
       <BrowserRouter>
 				<Routes>
-					<Route path='/' element={<>hi login</>}/>
-					<Route path="/nav/*" element={<NavigationRouter/>} exact />
+					<Route path='/' element={<Login/>}/>
+					<Route path="/v1/*" element={<NavigationRouter/>} exact />
 					
 				</Routes>
 			</BrowserRouter>
