@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import MenuIcon from '@material-ui/icons/Menu';
 
 
-const TopNav = ()=>{
+const TopNav = (props)=>{
 
     const navigator = useNavigate();
 
@@ -18,7 +18,7 @@ const TopNav = ()=>{
                 
                     <Navbar.Brand className="d-flex align-items-center justify-content-center">
                         {/* <img src={logo} alt="logo" width={"90px"} height={"30px"}/> */}
-                        <MenuIcon/>
+                        <MenuIcon onClick={()=>{props.collapseSidebar()}}/>
                     </Navbar.Brand>
                     <Navbar.Toggle />
                     <Navbar.Collapse className="justify-content-end">
