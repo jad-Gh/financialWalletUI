@@ -89,7 +89,6 @@ $secondary-color: #B0AFB1;
 .MuiTableRow-root{
     td{
         font-size: 14px !important;
-
         .MuiIconButton-root{
             // padding: 5px !important;
             border-radius: 0 !important;
@@ -107,6 +106,10 @@ $secondary-color: #B0AFB1;
     sans-serif !important;
 }
 
+.MuiPaper-elevation2{
+    box-shadow: none !important;
+}
+
 .form-check-input:checked{
 background-color: $primary-color !important;
 border-color: $primary-color !important;
@@ -116,6 +119,10 @@ border-color: $primary-color !important;
     height: 50vh;
     overflow-x: hidden;
     overflow-y: scroll;
+}
+
+.rounded-container-card{
+    border-radius: 20px !important;
 }
 
 

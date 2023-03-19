@@ -15,7 +15,7 @@ const NavigationRouter = ()=>{
         <>
             <TopNav collapseSidebar={toggleSidebar}/>
 
-            <Sidebar breakPoint="always">
+            <Sidebar breakPoint="always" backgroundColor="#fff">
                 <Menu>
                     <MenuItem component={<Link to="/v1/dashboard" />}> 
                         Dashboard
