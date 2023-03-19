@@ -26,11 +26,12 @@ const Categories = ()=>{
                                     maxLength={"50"}
                                     value={state.search}
                                     onChange={()=>{}}
+                                    className="m-1"
                                 />
                             </Col>
                             <Col md="8" className="d-flex justify-content-end">
                                 <Button 
-                                className="add-btn mx-2"
+                                className="add-btn m-1"
                                 disabled={state.loading}
                                 onClick={()=>{}}
                                 >

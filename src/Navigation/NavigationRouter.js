@@ -16,17 +16,39 @@ const NavigationRouter = ()=>{
             <TopNav collapseSidebar={toggleSidebar}/>
 
             <Sidebar breakPoint="always" backgroundColor="#fff">
-                <Menu>
-                    <MenuItem component={<Link to="/v1/dashboard" />}> 
+                <Menu
+                  menuItemStyles={{
+                    button: ({ level, active, disabled }) => {
+                      // only apply styles on first level elements of the tree
+                      if (level === 0)
+                        return {
+                          color: disabled ? '#f5d9ff' : '#191F6C',
+                          backgroundColor: active ? '#191F6C50' : undefined,
+                        };
+                    },
+                  }}
+                >
+                    <MenuItem 
+                    active={window.location.pathname.includes("dashboard")} 
+                    component={
+                    <Link to="/v1/dashboard" onClick={toggleSidebar}/>
+                    }> 
                         Dashboard
                     </MenuItem>
-                    <MenuItem component={<Link to="/v1/categories" />}> 
+                    <MenuItem 
+                    active={window.location.pathname.includes("categories")} 
+                    component={<Link to="/v1/categories" onClick={toggleSidebar}/>}
+                    > 
                         Categories
                     </MenuItem>
-                    <MenuItem component={<Link to="/v1/conversions" />}> 
+                    <MenuItem 
+                    active={window.location.pathname.includes("conversions")} 
+                    component={<Link to="/v1/conversions" onClick={toggleSidebar}/>}> 
                         Conversions
                     </MenuItem>
-                    <MenuItem component={<Link to="/v1/transactions" />}> 
+                    <MenuItem 
+                    active={window.location.pathname.includes("transactions")} 
+                    component={<Link to="/v1/transactions" onClick={toggleSidebar}/>}> 
                         Transations
                     </MenuItem>
                 </Menu>
