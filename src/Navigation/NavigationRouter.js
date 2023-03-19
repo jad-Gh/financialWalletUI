@@ -31,24 +31,24 @@ const NavigationRouter = ()=>{
                     <MenuItem 
                     active={window.location.pathname.includes("dashboard")} 
                     component={
-                    <Link to="/v1/dashboard" onClick={toggleSidebar}/>
+                    <Link to="/v1/dashboard" onClick={()=>{toggleSidebar(false)}}/>
                     }> 
                         Dashboard
                     </MenuItem>
                     <MenuItem 
                     active={window.location.pathname.includes("categories")} 
-                    component={<Link to="/v1/categories" onClick={toggleSidebar}/>}
+                    component={<Link to="/v1/categories" onClick={()=>{toggleSidebar(false)}}/>}
                     > 
                         Categories
                     </MenuItem>
                     <MenuItem 
                     active={window.location.pathname.includes("conversions")} 
-                    component={<Link to="/v1/conversions" onClick={toggleSidebar}/>}> 
+                    component={<Link to="/v1/conversions" onClick={()=>{toggleSidebar(false)}}/>}> 
                         Conversions
                     </MenuItem>
                     <MenuItem 
                     active={window.location.pathname.includes("transactions")} 
-                    component={<Link to="/v1/transactions" onClick={toggleSidebar}/>}> 
+                    component={<Link to="/v1/transactions" onClick={()=>{toggleSidebar(false)}}/>}> 
                         Transations
                     </MenuItem>
                 </Menu>
