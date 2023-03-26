@@ -8,7 +8,7 @@ import HourglassEmptyIcon from '@material-ui/icons/HourglassEmpty';
 const Login = ()=>{ 
 
     const [state,setState] = useState({
-        username:"",
+        email:"",
         password:"",
         error:"",
         loading:false,
@@ -22,14 +22,14 @@ const Login = ()=>{
         });
 
         let postData = {
-            username:state.username,
+            email:state.email,
             password:state.password
         }
 
         axios.post(LOGIN,postData,CONFIG)
         .then((res)=>{
-            localStorage.setItem("token",res?.headers?.jwttoken)
-            navigate("/institution")
+            localStorage.setItem("token",res?.data)
+            navigate("/dashboard")
         }).catch((err)=>{
         
             if (err?.response?.status===401){
@@ -65,17 +65,17 @@ const Login = ()=>{
                                     }}>
                                     <Row>
                                         <Col className="text-start">
-                                            Username
+                                            Email
                                         </Col>
                                     </Row>
                                     <Form.Control 
                                     type="text" 
-                                    placeholder="Username" 
+                                    placeholder="Email" 
                                     className="my-2" 
-                                    value={state.username}
+                                    value={state.email}
                                     maxLength={80}
                                     onChange={(e)=>{
-                                        setState({...state,username:e.target.value})
+                                        setState({...state,email:e.target.value})
                                     }}
                                     />
 
@@ -103,8 +103,8 @@ const Login = ()=>{
 
                                     <Button 
                                     className="mt-3" 
-                                    disabled={!state.username || !state.password  || state.loading}
-                                    // onClick={()=>{signIn()}}
+                                    disabled={!state.email || !state.password  || state.loading}
+                                    onClick={()=>{signIn()}}
                                     type="submit"
                                     style={{width:"100%"}}
                                     >
