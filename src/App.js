@@ -3,11 +3,15 @@ import './App.scss';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import NavigationRouter from './Navigation/NavigationRouter';
 import Login from './Login/Login';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 function App() {
   return (
     <div className="App">
+      <ToastContainer/>
+        
       <BrowserRouter>
 				<Routes>
 					<Route path='/' element={<Login/>}/>

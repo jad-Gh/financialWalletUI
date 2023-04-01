@@ -29,7 +29,7 @@ const Login = ()=>{
         axios.post(LOGIN,postData,CONFIG)
         .then((res)=>{
             localStorage.setItem("token",res?.data)
-            navigate("/dashboard")
+            navigate("/v1/dashboard")
         }).catch((err)=>{
         
             if (err?.response?.status===401){
