@@ -5,6 +5,7 @@ import NavigationRouter from './Navigation/NavigationRouter';
 import Login from './Login/Login';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import "react-datepicker/dist/react-datepicker.css";
 
 
 function App() {

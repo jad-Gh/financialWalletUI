@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import MaterialTable from "material-table";
-import { Button, Card, Col, Container, Form, Modal, Row } from "react-bootstrap";
+import { Button, Card, Col, Container, Form, Modal, Row,Offcanvas } from "react-bootstrap";
 import { CONFIG, GET_CATGORIES, GET_TRANSACTIONS } from "../API";
 import axios from "axios";
 import { errorHandler, formatDate } from "../UTILS/functions";
 import { toast } from "react-toastify";
 import Select from "react-select";
+import DatePicker from "react-datepicker";
 
 
 const Transactions = ()=>{
@@ -33,6 +34,18 @@ const Transactions = ()=>{
 
         totalTransactions:0,
         totalVolume:0,
+
+        showFilterBy:false,
+        categoryToFilter:null,
+        fromDate:null,
+        toDate:null,
+        selectedSortBy:{label:"Creation Date Ascending",value:1},
+        sortByList:[
+            {label:"Creation Date Ascending",value:1},
+            {label:"Creation Date Descending",value:2},
+            {label:"Amount Ascending ",value:3},
+            {label:"Amount Descending",value:4},
+        ],
 
     })
 
@@ -72,6 +85,14 @@ const Transactions = ()=>{
                description:data?.description,
                amount:Math.abs(data?.amount),
                selectedCategory:{label:data?.finCategory?.name,value:data?.finCategory?.id}
+            };
+        });
+    }
+
+    const toggleFilterby = ()=>{
+        setState(prevState => {
+            return {...prevState,
+               showFilterBy: !state.showFilterBy,
             };
         });
     }
@@ -223,7 +244,7 @@ const Transactions = ()=>{
                                 variant="secondary"
                                 disabled={state.loading}
                                 onClick={()=>{
-
+                                    toggleFilterby();
                                 }}
                                 >
                                     Filter By
@@ -239,6 +260,94 @@ const Transactions = ()=>{
                                 </Button> 
                             </Col>
                         </Row>
+
+                        <Offcanvas show={state.showFilterBy} onHide={toggleFilterby} placement="end" className="offcanvas-width" >
+                            <Offcanvas.Header closeButton>
+                                <Offcanvas.Title>Filter By</Offcanvas.Title>
+                            </Offcanvas.Header>
+                            <Offcanvas.Body>
+                                <Col md="12">
+
+                                    <Form.Label>Category</Form.Label>
+                                    <Select
+                                    options={state.categoryList}
+                                    isClearable
+                                    value={state.categoryToFilter}
+                                    onChange={(e)=>{
+                                        setState(prevState => {
+                                            return {...prevState,
+                                                categoryToFilter:e,
+                                            };
+                                        }); 
+                                    }}
+                                    className="mb-2"
+                                    />
+
+                                    <Form.Label>Sort By</Form.Label>
+                                    <Select
+                                    options={state.sortByList}
+                                    isClearable
+                                    value={state.selectedSortBy}
+                                    onChange={(e)=>{
+                                        setState(prevState => {
+                                            return {...prevState,
+                                                selectedSortBy:e,
+                                            };
+                                        }); 
+                                    }}
+                                    className="mb-2"
+                                    />
+
+
+                                    <Form.Label>From Date</Form.Label>
+                                    <DatePicker
+                                    showIcon
+                                    dateFormat="dd/MM/yyyy"
+                                    maxDate={state.toDate ?? new Date()}
+                                    showMonthDropdown
+                                    showYearDropdown
+                                    selected={state.fromDate}
+                                    onChange={(date) => {
+                                        setState(prevState => {
+                                            return {...prevState,
+                                                fromDate:date,
+                                            };
+                                        }); 
+                                    }}
+                                    className="mb-1"
+                                    />
+
+                                    <Form.Label>To Date</Form.Label>
+                                    <DatePicker
+                                    showIcon
+                                    dateFormat="dd/MM/yyyy"
+                                    maxDate={new Date()}
+                                    minDate={state.fromDate}
+                                    selected={state.toDate}
+                                    showMonthDropdown
+                                    showYearDropdown
+                                    onChange={(date) => {
+                                        setState(prevState => {
+                                            return {...prevState,
+                                                toDate:date,
+                                            };
+                                        }); 
+                                    }}
+                                    />
+                                    <Col size="12" className="bottom-filter-row m-3">
+                                        
+                                            <span className="clear-button">Clear All</span>
+
+                                            <Button variant="primary" className="filter-btn" onClick={()=>{}} 
+                                            disabled={state.loading}>
+                                                Apply
+                                            </Button>
+                                        
+                                    </Col>
+                                </Col>
+                            </Offcanvas.Body>
+                        </Offcanvas>
+
                         <MaterialTable
                             key={state.tableKey}
                             columns={[
@@ -527,6 +636,7 @@ const Transactions = ()=>{
                     <Button variant="danger" onClick={deleteTransaction} disabled={state.loading}>Delete</Button>
                 </Modal.Footer>
             </Modal>
+
             
         </div>
     )
