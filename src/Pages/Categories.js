@@ -3,7 +3,7 @@ import MaterialTable from "material-table";
 import { Button, Card, Col, Container, Form, Modal, Row } from "react-bootstrap";
 import { CONFIG, GET_CATGORIES } from "../API";
 import axios from "axios";
-import { errorHandler } from "../UTILS/functions";
+import { errorHandler, formatDate } from "../UTILS/functions";
 import { toast } from "react-toastify";
 
 
@@ -204,7 +204,12 @@ const Categories = ()=>{
                                     axios.get(url,CONFIG)
                                     .then((res)=>{
                                       resolve({
-                                        data: res?.data?.data?.data,
+                                        data: res?.data?.data?.data.map((item)=>{
+                                            return {
+                                                ...item,
+                                                createdAt:formatDate(item?.createdAt)
+                                            }
+                                        }),
                                         page: state.resetPagination ? 0 : res?.data?.data?.page,
                                         totalCount: res?.data?.data?.totalCount,
                                       })

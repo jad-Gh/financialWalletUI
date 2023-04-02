@@ -5,7 +5,7 @@ import MaterialTable from "material-table";
 import { Button, Card, Col, Container, Form, Modal, Row } from "react-bootstrap";
 import { CONFIG, GET_CATGORIES, GET_TRANSACTIONS } from "../API";
 import axios from "axios";
-import { errorHandler } from "../UTILS/functions";
+import { errorHandler, formatDate } from "../UTILS/functions";
 import { toast } from "react-toastify";
 import Select from "react-select";
 
@@ -31,13 +31,18 @@ const Transactions = ()=>{
         editModal:false,
         itemToEdit:null,
 
-        
+        totalTransactions:0,
+        totalVolume:0,
 
     })
 
     useEffect(()=>{
         getCategories();
     },[])
+
+    useEffect(()=>{
+        getTransactionKPIs();
+    },[state.tableKey])
 
     const toggleAddModal = ()=>{
         setState(prevState => {
@@ -59,13 +64,14 @@ const Transactions = ()=>{
         });
     }
 
-    const toggleEditModal = (id,name,expense)=>{
+    const toggleEditModal = (data)=>{
         setState(prevState => {
             return {...prevState,
                editModal: !state.editModal,
-               itemToEdit:id,
-               categoryName:name,
-               expense:expense
+               itemToEdit:data?.id,
+               description:data?.description,
+               amount:Math.abs(data?.amount),
+               selectedCategory:{label:data?.finCategory?.name,value:data?.finCategory?.id}
             };
         });
     }
@@ -99,12 +105,34 @@ const Transactions = ()=>{
         })
     }
 
+    const getTransactionKPIs = ()=>{
+        let url = new URL(`${GET_TRANSACTIONS}/kpis`)
+
+        CONFIG.headers.Authorization = "Bearer " + localStorage.getItem("token") 
+
+        axios.get(url,CONFIG)
+        .then((res)=>{
+            setState(prevState => 
+                {
+                    return {...prevState,
+                        totalTransactions:res?.data?.data?.data?.transactionCount,
+                        totalVolume:res?.data?.data?.data?.totalVolumeFormatted,
+                    };
+                }
+            );
+
+        })
+        .catch((err)=>{
+            errorHandler(err) 
+        })
+    }
+
     const addTransaction = ()=>{
         setState(prevState => {return {...prevState,loading:true,};});
 
         let url = new URL(GET_TRANSACTIONS)
         let body = {
-            amount:state.amount,
+            amount:Number(state.amount),
             description:state.description,
             finCategory:{id: state?.selectedCategory?.value}
         }
@@ -153,18 +181,20 @@ const Transactions = ()=>{
     const editTransaction=()=>{
         setState(prevState => {return {...prevState,loading:true,};});
 
-        let url = new URL(GET_CATGORIES)
+        let url = new URL(GET_TRANSACTIONS)
         let body = {
-            name:state.categoryName,
-            expense:state.expense,
-            id:state.itemToEdit
+            id:state.itemToEdit,
+            description:state.description,
+            amount:state.amount,
+            finCategory:{id:state?.selectedCategory?.value}
+
         }
 
         CONFIG.headers.Authorization = "Bearer " + localStorage.getItem("token");
 
         axios.put(url,body,CONFIG)
         .then((res)=>{
-            toast.success("Category Updated successfully !");
+            toast.success("Transaction Updated successfully !");
             toggleEditModal();
             setState(prevState => {
                 return {...prevState,
@@ -213,7 +243,7 @@ const Transactions = ()=>{
                             key={state.tableKey}
                             columns={[
                                 { title: 'Category', field: 'category' },
-                                { title: 'Amount', field: 'amount' },
+                                { title: 'Amount', field: 'displayAmount' },
                                 { title: 'Description', field: 'description' },
                                 { title: 'Creation Date', field: 'createdAt' },
                             
@@ -238,11 +268,19 @@ const Transactions = ()=>{
                                             return {
                                                 ...item,
                                                 category:item?.finCategory?.name,
-                                                amount:
+                                                displayAmount:
                                                 <span 
                                                 className={item?.finCategory?.expense ? "text-danger" : "text-success"}>
-                                                    <b>{item?.amount}</b>
-                                                </span>
+                                                    <b>
+                                                        {new Intl.NumberFormat('en-US', {
+                                                            style: 'currency',
+                                                            currency: 'USD',
+                                                            }).format(item?.amount)
+                                                        }
+                                                    
+                                                    </b>
+                                                </span>,
+                                                createdAt:formatDate(item?.createdAt)
                                             }
                                         }),
                                         page: state.resetPagination ? 0 : res?.data?.data?.page,
@@ -272,7 +310,7 @@ const Transactions = ()=>{
                                     icon: "edit",
                                     tooltip: 'Edit',
                                     onClick: (event, rowData) => {
-                                         toggleEditModal(rowData?.id,rowData?.name,rowData?.expense)
+                                         toggleEditModal(rowData)
                                     }
                                 },
                                 {
@@ -291,6 +329,30 @@ const Transactions = ()=>{
                                 // pageSizeOptions:[],
                             }}
                         />
+                        <Row className="mt-3 mb-1" >
+                            <Col xl="3"></Col>
+                            <Col xl="3"></Col>
+                            <Col xl="3" className="mt-2 d-flex justify-content-end">
+                                <span className="total-container m-1">
+                                    <span className="total-title">
+                                        Total Transactions
+                                    </span>
+                                    <span className="total-value">
+                                        {state.totalTransactions}
+                                    </span>
+                                </span>
+                            </Col>
+                            <Col xl="3" className="mt-2 d-flex justify-content-end">
+                                <span className="total-container m-1">
+                                    <span className="total-title">
+                                        Total Volume
+                                    </span>
+                                    <span className="total-value">
+                                        {state.totalVolume}
+                                    </span>
+                                </span>
+                            </Col>
+                        </Row>
                     </Card.Body>
                 </Card>
             </Container>
@@ -330,7 +392,7 @@ const Transactions = ()=>{
                             placeholder="Enter Amount (USD)"
                             onChange={(e)=>{
                                 
-                                if (/^[0-9]+$/.test(e.target.value) || e.target.value==="")
+                                if (/^\d+(\.\d+)?$/.test(e.target.value) || e.target.value==="")
                                 setState(prevState => {
                                     return {...prevState,
                                         amount:e.target.value,

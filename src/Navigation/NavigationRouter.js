@@ -49,7 +49,7 @@ const NavigationRouter = ()=>{
                     <MenuItem 
                     active={window.location.pathname.includes("transactions")} 
                     component={<Link to="/v1/transactions" onClick={()=>{toggleSidebar(false)}}/>}> 
-                        Transations
+                        Transactions
                     </MenuItem>
                 </Menu>
             </Sidebar>
