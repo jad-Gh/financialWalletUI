@@ -82,7 +82,7 @@ $secondary-color: #B0AFB1;
 }
 
 .MuiTableCell-root{
-    padding: auto !important;
+    padding: 1px !important;
     // height: 30px !important;
 }
   
@@ -123,6 +123,10 @@ border-color: $primary-color !important;
 
 .rounded-container-card{
     border-radius: 20px !important;
+}
+
+.max-height-textarea{
+    max-height: 200px !important;
 }
 
 

@@ -12,3 +12,5 @@ export const CONFIG = {
 export const LOGIN = DEV_URL + "/login";
 
 export const GET_CATGORIES = DEV_URL + "/category";
+
+export const GET_TRANSACTIONS = DEV_URL + "/transaction";
