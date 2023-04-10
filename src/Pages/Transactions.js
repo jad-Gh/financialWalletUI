@@ -5,7 +5,7 @@ import MaterialTable from "material-table";
 import { Button, Card, Col, Container, Form, Modal, Row,Offcanvas } from "react-bootstrap";
 import { CONFIG, GET_CATGORIES, GET_TRANSACTIONS } from "../API";
 import axios from "axios";
-import { errorHandler, formatDate } from "../UTILS/functions";
+import { errorHandler, formatDate, get_YYYY_MM_DD } from "../UTILS/functions";
 import { toast } from "react-toastify";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
@@ -37,8 +37,8 @@ const Transactions = ()=>{
 
         showFilterBy:false,
         categoryToFilter:null,
-        fromDate:null,
-        toDate:null,
+        fromDate:new Date(new Date().getFullYear(),new Date().getMonth(),1),
+        toDate:new Date(),
         selectedSortBy:{label:"Creation Date Ascending",value:1},
         sortByList:[
             {label:"Creation Date Ascending",value:1},
@@ -46,6 +46,8 @@ const Transactions = ()=>{
             {label:"Amount Ascending ",value:3},
             {label:"Amount Descending",value:4},
         ],
+
+        quickFilter:"This Month",
 
     })
 
@@ -128,6 +130,13 @@ const Transactions = ()=>{
 
     const getTransactionKPIs = ()=>{
         let url = new URL(`${GET_TRANSACTIONS}/kpis`)
+
+        url.searchParams.append("startDate",get_YYYY_MM_DD(state.fromDate));
+        url.searchParams.append("endDate",get_YYYY_MM_DD(state.toDate));
+        if (state.categoryToFilter?.value) 
+        {
+            url.searchParams.append("id",state.categoryToFilter?.value );
+        }
 
         CONFIG.headers.Authorization = "Bearer " + localStorage.getItem("token") 
 
@@ -229,6 +238,18 @@ const Transactions = ()=>{
         })
     }
 
+    const clearFilters = ()=>{
+        setState(prevState => {
+            return {...prevState,
+                categoryToFilter:null,
+                fromDate:new Date(new Date().getFullYear(),new Date().getMonth(),1),
+                toDate:new Date(),
+                selectedSortBy:{label:"Creation Date Ascending",value:1},
+                tableKey:Math.random(),
+            };
+        });
+    }
+
     return(
         <div>
             <Container>
@@ -266,6 +287,61 @@ const Transactions = ()=>{
                                 <Offcanvas.Title>Filter By</Offcanvas.Title>
                             </Offcanvas.Header>
                             <Offcanvas.Body>
+
+                                <Col md="12">
+                                    <Form.Label>Quick FIlter</Form.Label>
+                                    <br />
+                                    <Button 
+                                    variant={state.quickFilter==="Today" ? "secondary": "outline-secondary"} 
+                                    size="sm"
+                                    className="m-1"
+                                    onClick={()=>{
+                                        setState(prevState => {
+                                            return {...prevState,
+                                                fromDate:new Date(),
+                                                toDate:new Date(),
+                                                quickFilter:"Today"
+                                            };
+                                        });
+                                    }}
+                                    >
+                                        Today
+                                    </Button>
+                                    <Button 
+                                    variant={state.quickFilter==="This Month" ? "secondary": "outline-secondary"} 
+                                    size="sm"
+                                    className="m-1"
+                                    onClick={()=>{
+                                        setState(prevState => {
+                                            return {...prevState,
+                                                fromDate:new Date(new Date().getFullYear(),new Date().getMonth(),1),
+                                                toDate:new Date(),
+                                                quickFilter:"This Month"
+                                            };
+                                        });
+                                    }}
+                                    >
+                                        This Month
+                                    </Button>
+                                    <Button 
+                                    variant={state.quickFilter==="This Year" ? "secondary": "outline-secondary"} 
+                                    size="sm"
+                                    className="m-1"
+                                    onClick={()=>{
+                                        setState(prevState => {
+                                            return {...prevState,
+                                                fromDate:new Date(new Date().getFullYear(),0,1),
+                                                toDate:new Date(),
+                                                quickFilter:"This Year"
+                                            };
+                                        });
+                                    }}
+                                    >
+                                        This Year
+                                    </Button>
+                                    
+                                </Col>
+
                                 <Col md="12">
 
                                     <Form.Label>Category</Form.Label>
@@ -336,9 +412,16 @@ const Transactions = ()=>{
                                     />
                                     <Col size="12" className="bottom-filter-row m-3">
                                         
-                                            <span className="clear-button">Clear All</span>
+                                            <span className="clear-button" onClick={clearFilters}>Clear All</span>
 
-                                            <Button variant="primary" className="filter-btn" onClick={()=>{}} 
+                                            <Button variant="primary" className="filter-btn" 
+                                            onClick={()=>{
+                                                setState(prevState => {
+                                                    return {...prevState,
+                                                        tableKey:Math.random(),
+                                                    };
+                                                });
+                                            }} 
                                             disabled={state.loading}>
                                                 Apply
                                             </Button>
@@ -367,6 +450,13 @@ const Transactions = ()=>{
                                     let url = new URL(GET_TRANSACTIONS)
                                     url.searchParams.append("page",state?.resetPagination ? 0 : query.page);
                                     url.searchParams.append("size",query.pageSize);
+                                    url.searchParams.append("startDate",get_YYYY_MM_DD(state.fromDate));
+                                    url.searchParams.append("endDate",get_YYYY_MM_DD(state.toDate));
+                                    if (state.categoryToFilter?.value) 
+                                    {
+                                        url.searchParams.append("categoryId",state.categoryToFilter?.value );
+                                    }
+                                    url.searchParams.append("orderBy",state?.selectedSortBy?.value ?? null);
 
                                     CONFIG.headers.Authorization = "Bearer " + localStorage.getItem("token") 
 
