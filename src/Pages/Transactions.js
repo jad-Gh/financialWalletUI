@@ -39,7 +39,7 @@ const Transactions = ()=>{
         categoryToFilter:null,
         fromDate:new Date(new Date().getFullYear(),new Date().getMonth(),1),
         toDate:new Date(),
-        selectedSortBy:{label:"Creation Date Ascending",value:1},
+        selectedSortBy:{label:"Creation Date Descending",value:2},
         sortByList:[
             {label:"Creation Date Ascending",value:1},
             {label:"Creation Date Descending",value:2},
@@ -244,8 +244,9 @@ const Transactions = ()=>{
                 categoryToFilter:null,
                 fromDate:new Date(new Date().getFullYear(),new Date().getMonth(),1),
                 toDate:new Date(),
-                selectedSortBy:{label:"Creation Date Ascending",value:1},
+                selectedSortBy:{label:"Creation Date Descending",value:2},
                 tableKey:Math.random(),
+                quickFilter:"This Month",
             };
         });
     }
