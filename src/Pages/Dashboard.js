@@ -5,6 +5,8 @@ import Select from "react-select";
 import { CONFIG, GET_CATGORIES, GET_TRANSACTIONS } from "../API";
 import axios from "axios";
 import { errorHandler, get_YYYY_MM_DD } from "../UTILS/functions";
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
 
 
 const Dashboard = ()=>{
@@ -16,16 +18,19 @@ const Dashboard = ()=>{
         fromDate:new Date(new Date().getFullYear(),new Date().getMonth(),1),
         toDate:new Date(),
         quickFilter:"This Month",
+        period:"DAY",
         categoryList:[],
 
         totalTransactions:0,
         totalVolume:0,
+        transactionVolumeByDate:[],
 
     });
 
     useEffect(()=>{
         getCategories();
         getTransactionKPIs();
+        getTransactionCharts();
     },[]);
 
     const toggleFilterby = ()=>{
@@ -43,6 +48,7 @@ const Dashboard = ()=>{
                 fromDate:new Date(new Date().getFullYear(),new Date().getMonth(),1),
                 toDate:new Date(),
                 quickFilter:"This Month",
+                period:"YEAR",
             };
         });
     }
@@ -105,6 +111,35 @@ const Dashboard = ()=>{
         })
     }
 
+    const getTransactionCharts = ()=>{
+        let url = new URL(`${GET_TRANSACTIONS}/charts`)
+
+        url.searchParams.append("startDate",get_YYYY_MM_DD(state.fromDate));
+        url.searchParams.append("endDate",get_YYYY_MM_DD(state.toDate));
+        url.searchParams.append("periodical",state.period);
+        if (state.categoryToFilter?.value) 
+        {
+            url.searchParams.append("id",state.categoryToFilter?.value );
+        }
+
+        CONFIG.headers.Authorization = "Bearer " + localStorage.getItem("token") 
+
+        axios.get(url,CONFIG)
+        .then((res)=>{
+            setState(prevState => 
+                {
+                    return {...prevState,
+                        transactionVolumeByDate:res?.data?.data?.data,
+                    };
+                }
+            );
+
+        })
+        .catch((err)=>{
+            errorHandler(err) 
+        })
+    }
+
     return(
         <div>
             <Container>
@@ -116,8 +151,8 @@ const Dashboard = ()=>{
                             </Offcanvas.Header>
                             <Offcanvas.Body>
 
-                                <Col md="12">
-                                    <Form.Label>Quick FIlter</Form.Label>
+                                <Col md="12" className="my-2">
+                                    <Form.Label className="main-filter-label">Quick Filter</Form.Label>
                                     <br />
                                     <Button 
                                     variant={state.quickFilter==="Today" ? "secondary": "outline-secondary"} 
@@ -170,9 +205,57 @@ const Dashboard = ()=>{
                                     
                                 </Col>
 
-                                <Col md="12">
+                                <Col md="12" className="my-2">
+                                    <Form.Label className="secondary-filter-label">Period</Form.Label>
+                                    <br />
+                                    <Button 
+                                    variant={state.period==="DAY" ? "secondary": "outline-secondary"} 
+                                    size="sm"
+                                    className="m-1"
+                                    onClick={()=>{
+                                        setState(prevState => {
+                                            return {...prevState,
+                                                period:"DAY"
+                                            };
+                                        });
+                                    }}
+                                    >
+                                        Day
+                                    </Button>
+                                    <Button 
+                                    variant={state.period==="MONTH" ? "secondary": "outline-secondary"} 
+                                    size="sm"
+                                    className="m-1"
+                                    onClick={()=>{
+                                        setState(prevState => {
+                                            return {...prevState,
+                                                period:"MONTH"
+                                            };
+                                        });
+                                    }}
+                                    >
+                                     Month
+                                    </Button>
+                                    <Button 
+                                    variant={state.period==="YEAR" ? "secondary": "outline-secondary"} 
+                                    size="sm"
+                                    className="m-1"
+                                    onClick={()=>{
+                                        setState(prevState => {
+                                            return {...prevState,
+                                                period:"YEAR"
+                                            };
+                                        });
+                                    }}
+                                    >
+                                        Year
+                                    </Button>
+                                    
+                                </Col>
 
-                                    <Form.Label>Category</Form.Label>
+                                <Col md="12" className="my-2">
+
+                                    <Form.Label className="secondary-filter-label">Category</Form.Label>
                                     <Select
                                     options={state.categoryList}
                                     isClearable
@@ -187,7 +270,7 @@ const Dashboard = ()=>{
                                     className="mb-2"
                                     />
 
-                                    <Form.Label>From Date</Form.Label>
+                                    <Form.Label className="secondary-filter-label">From Date</Form.Label>
                                     <DatePicker
                                     showIcon
                                     dateFormat="dd/MM/yyyy"
@@ -205,7 +288,7 @@ const Dashboard = ()=>{
                                     className="mb-1"
                                     />
 
-                                    <Form.Label>To Date</Form.Label>
+                                    <Form.Label className="secondary-filter-label" >To Date</Form.Label>
                                     <DatePicker
                                     showIcon
                                     dateFormat="dd/MM/yyyy"
@@ -229,6 +312,7 @@ const Dashboard = ()=>{
                                             <Button variant="primary" className="filter-btn" 
                                             onClick={()=>{
                                                 getTransactionKPIs();
+                                                getTransactionCharts();
                                             }} 
                                             disabled={state.loading}>
                                                 Apply
@@ -302,7 +386,62 @@ const Dashboard = ()=>{
                         <Col md="6">
                             <Card className="dashboard-cards m-1">
                                 <Card.Body>
-                                    Card 1
+                                    <HighchartsReact
+                                    highcharts={Highcharts}
+                                    options={{
+                                        chart: {
+                                            type: 'column'
+                                        },
+                                        title: {
+                                            text: 'Transaction Volume by Date'
+                                        },
+                                       
+                                        xAxis: {
+                                            categories: state.transactionVolumeByDate.map((item)=>{return item?.date}),
+                                            crosshair: true
+                                        },
+                                        yAxis: [{
+                                            title: {
+                                                text: "Volume"
+                                            },
+                                            
+                                        },{
+                                            title: {
+                                                text: "Transactions",
+                                            },
+                                            opposite:true,
+                                            labels: {
+                                                format: '{value}',
+                                                // Add the following line to display only full numbers without decimals
+                                                precision: 0
+                                              }
+                                        }],
+                                        tooltip: {
+                                            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                                            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                                                '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+                                            footerFormat: '</table>',
+                                            shared: true,
+                                            useHTML: true
+                                        },
+                                        plotOptions: {
+                                            column: {
+                                                pointPadding: 0.2,
+                                                borderWidth: 0
+                                            }
+                                        },
+                                        series: [{
+                                            name: 'Volume',
+                                            data: state.transactionVolumeByDate.map((item)=>{return item?.totalVolume}),
+                                            yAxis:0,
+                                    
+                                        }, {
+                                            name: 'Transactions',
+                                            data: state.transactionVolumeByDate.map((item)=>{return item?.transactionCount}),
+                                            yAxis:1,
+                                        }]
+                                    }}
+                                    />
                                 </Card.Body>
                             </Card>
                         </Col>

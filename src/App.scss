@@ -193,6 +193,7 @@ border-color: $primary-color !important;
     border-radius: 20px !important;
     background-color: white !important;
 
+
     .kpi-title{
         font-size: 20px;
         font-weight: bold;
@@ -204,6 +205,15 @@ border-color: $primary-color !important;
         font-weight: bold;
         color: black;
     }
+}
+
+.main-filter-label{
+    font-weight: 800;
+    color: $primary-color;
+}
+
+.secondary-filter-label{
+    font-weight: 600;
 }
 
 
