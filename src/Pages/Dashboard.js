@@ -24,6 +24,7 @@ const Dashboard = ()=>{
         totalTransactions:0,
         totalVolume:0,
         transactionVolumeByDate:[],
+        transactionVolumeByCategory:[],
 
     });
 
@@ -31,6 +32,7 @@ const Dashboard = ()=>{
         getCategories();
         getTransactionKPIs();
         getTransactionCharts();
+        getTransactionChartsByCategory();
     },[]);
 
     const toggleFilterby = ()=>{
@@ -130,6 +132,34 @@ const Dashboard = ()=>{
                 {
                     return {...prevState,
                         transactionVolumeByDate:res?.data?.data?.data,
+                    };
+                }
+            );
+
+        })
+        .catch((err)=>{
+            errorHandler(err) 
+        })
+    }
+
+    const getTransactionChartsByCategory = ()=>{
+        let url = new URL(`${GET_TRANSACTIONS}/charts-by-category`)
+
+        url.searchParams.append("startDate",get_YYYY_MM_DD(state.fromDate));
+        url.searchParams.append("endDate",get_YYYY_MM_DD(state.toDate));
+        if (state.categoryToFilter?.value) 
+        {
+            url.searchParams.append("id",state.categoryToFilter?.value );
+        }
+
+        CONFIG.headers.Authorization = "Bearer " + localStorage.getItem("token") 
+
+        axios.get(url,CONFIG)
+        .then((res)=>{
+            setState(prevState => 
+                {
+                    return {...prevState,
+                        transactionVolumeByCategory:res?.data?.data?.data,
                     };
                 }
             );
@@ -313,6 +343,7 @@ const Dashboard = ()=>{
                                             onClick={()=>{
                                                 getTransactionKPIs();
                                                 getTransactionCharts();
+                                                getTransactionChartsByCategory();
                                             }} 
                                             disabled={state.loading}>
                                                 Apply
@@ -455,7 +486,62 @@ const Dashboard = ()=>{
                         <Col md="6">
                             <Card className="dashboard-cards m-1">
                                 <Card.Body>
-                                    Card 1
+                                <HighchartsReact
+                                    highcharts={Highcharts}
+                                    options={{
+                                        chart: {
+                                            type: 'column'
+                                        },
+                                        title: {
+                                            text: 'Transaction Volume by Category'
+                                        },
+                                       
+                                        xAxis: {
+                                            categories: state.transactionVolumeByCategory.map((item)=>{return item?.categoryName}),
+                                            crosshair: true
+                                        },
+                                        yAxis: [{
+                                            title: {
+                                                text: "Volume"
+                                            },
+                                            
+                                        },{
+                                            title: {
+                                                text: "Transactions",
+                                            },
+                                            opposite:true,
+                                            labels: {
+                                                format: '{value}',
+                                                // Add the following line to display only full numbers without decimals
+                                                precision: 0
+                                              }
+                                        }],
+                                        tooltip: {
+                                            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                                            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                                                '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+                                            footerFormat: '</table>',
+                                            shared: true,
+                                            useHTML: true
+                                        },
+                                        plotOptions: {
+                                            column: {
+                                                pointPadding: 0.2,
+                                                borderWidth: 0
+                                            }
+                                        },
+                                        series: [{
+                                            name: 'Volume',
+                                            data: state.transactionVolumeByCategory.map((item)=>{return item?.totalVolume}),
+                                            yAxis:0,
+                                    
+                                        }, {
+                                            name: 'Transactions',
+                                            data: state.transactionVolumeByCategory.map((item)=>{return item?.transactionCount}),
+                                            yAxis:1,
+                                        }]
+                                    }}
+                                    />
                                 </Card.Body>
                             </Card>
                         </Col>   
