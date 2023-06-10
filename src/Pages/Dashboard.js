@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Card, Col, Container, Form, Offcanvas, Row } from "react-bootstrap"
 import DatePicker from "react-datepicker";
 import Select from "react-select";
-import { CONFIG, GET_CATGORIES, GET_TRANSACTIONS } from "../API";
+import { CONFIG, GET_CATGORIES, GET_FINASSETS, GET_TRANSACTIONS } from "../API";
 import axios from "axios";
 import { errorHandler, get_YYYY_MM_DD } from "../UTILS/functions";
 import Highcharts from 'highcharts';
@@ -26,6 +26,14 @@ const Dashboard = ()=>{
         transactionVolumeByDate:[],
         transactionVolumeByCategory:[],
 
+        totalFinAssetVolume:0,
+        totalFinAssetProfit:0,
+
+        totalPortfolio:0,
+        totalPortfolioAsset:0,
+        totalPortfolioVolume:0,
+
+
     });
 
     useEffect(()=>{
@@ -33,6 +41,9 @@ const Dashboard = ()=>{
         getTransactionKPIs();
         getTransactionCharts();
         getTransactionChartsByCategory();
+
+        getFinAssetKPIs();
+        getPortfolioKPIs();
     },[]);
 
     const toggleFilterby = ()=>{
@@ -103,6 +114,51 @@ const Dashboard = ()=>{
                     return {...prevState,
                         totalTransactions:res?.data?.data?.data?.transactionCount,
                         totalVolume:res?.data?.data?.data?.totalVolumeFormatted,
+                    };
+                }
+            );
+
+        })
+        .catch((err)=>{
+            errorHandler(err) 
+        })
+    }
+
+    const getFinAssetKPIs = ()=>{
+        let url = new URL(`${GET_FINASSETS}/kpi`)
+
+        CONFIG.headers.Authorization = "Bearer " + localStorage.getItem("token") 
+
+        axios.get(url,CONFIG)
+        .then((res)=>{
+            setState(prevState => 
+                {
+                    return {...prevState,
+                        totalFinAssetVolume:res?.data?.data?.data?.totalVolumeFormatted,
+                        totalFinAssetProfit:res?.data?.data?.data?.totalProfitFormatted,
+                    };
+                }
+            );
+
+        })
+        .catch((err)=>{
+            errorHandler(err) 
+        })
+    }
+
+    const getPortfolioKPIs = ()=>{
+        let url = new URL(`${GET_FINASSETS}/total-balance`)
+
+        CONFIG.headers.Authorization = "Bearer " + localStorage.getItem("token") 
+
+        axios.get(url,CONFIG)
+        .then((res)=>{
+            setState(prevState => 
+                {
+                    return {...prevState,
+                        totalPortfolio:res?.data?.data?.Total,
+                        totalPortfolioAsset:res?.data?.data?.Assets,
+                        totalPortfolioVolume:res?.data?.data?.Transactions,
                     };
                 }
             );
@@ -371,14 +427,41 @@ const Dashboard = ()=>{
                         <Col md="3">
                             <Card className="dashboard-cards m-1">
                                 <Card.Body>
-                                    Card 1
+                                    <Col md="12" className="d-flex justify-content-center kpi-title">
+                                        Total Assets
+                                    </Col>
+                                    <Col md="12" className="d-flex justify-content-center align-items-center kpi-value">
+                                        {state.totalFinAssetVolume} &nbsp;
+
+                                        <span style={{fontSize:"13px"}}>
+                                            ({Number(state.totalFinAssetProfit) > 0 ? 
+                                            <span className="text-success">
+                                                {state.totalFinAssetProfit}
+                                            </span> 
+                                            : 
+                                            <span className="text-danger">
+                                                {state.totalFinAssetProfit}
+                                            </span>
+                                            })
+                                        </span>
+                                    </Col>
+                                    
                                 </Card.Body>
                             </Card>
                         </Col>
                         <Col md="3">
                             <Card className="dashboard-cards m-1">
                                 <Card.Body>
-                                    Card 1
+                                    <Col md="12" className="d-flex justify-content-center kpi-title">
+                                        Total Portfolio
+                                    </Col>
+                                    <Col md="12" className="d-flex justify-content-center kpi-value">
+                                            {new Intl.NumberFormat('en-US', {
+                                                style: 'currency',
+                                                currency: 'USD',
+                                                }).format(state.totalPortfolio)
+                                            }
+                                    </Col>
                                 </Card.Body>
                             </Card>
                         </Col>
@@ -386,7 +469,7 @@ const Dashboard = ()=>{
                             <Card className="dashboard-cards m-1">
                                 <Card.Body>
                                 <Col md="12" className="d-flex justify-content-center kpi-title">
-                                        Total Trx.
+                                        Transactions
                                     </Col>
                                     <Col md="12" className="d-flex justify-content-center kpi-value">
                                         {state.totalTransactions}
@@ -398,7 +481,7 @@ const Dashboard = ()=>{
                             <Card className="dashboard-cards m-1">
                                 <Card.Body>
                                     <Col md="12" className="d-flex justify-content-center kpi-title">
-                                        Total Volume
+                                        Volume
                                     </Col>
                                     <Col md="12" className="d-flex justify-content-center kpi-value">
                                         {state.totalVolume}
@@ -410,7 +493,54 @@ const Dashboard = ()=>{
                         <Col md="6" >
                             <Card className="dashboard-cards m-1">
                                 <Card.Body>
-                                    Card 1
+                                    <HighchartsReact
+                                        highcharts={Highcharts}
+                                        options={{
+                                            chart: {
+                                                plotBackgroundColor: null,
+                                                plotBorderWidth: null,
+                                                plotShadow: false,
+                                                type: 'pie'
+                                            },
+                                            credits: {
+                                                enabled: false
+                                            },
+                                            title: {
+                                                text: 'Total Portfolio',
+                                                align:"center"
+                                            },
+                                            tooltip: {
+                                                pointFormat: '{series.name}: <b> $ {point.y:.2f}</b>'
+                                            },
+                                            accessibility: {
+                                                point: {
+                                                    valueSuffix: '%'
+                                                }
+                                            },
+                                            plotOptions: {
+                                                pie: {
+                                                    allowPointSelect: true,
+                                                    cursor: 'pointer',
+                                                    dataLabels: {
+                                                        enabled: true,
+                                                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                                                    }
+                                                }
+                                            },
+                                            series: [{
+                                                name: 'Volume',
+                                                colorByPoint: true,
+                                                data: [{
+                                                    name: 'Assets',
+                                                    y: state.totalPortfolioAsset,
+                                                },{
+                                                    name: 'Transactions',
+                                                    y: state.totalPortfolioVolume,
+                                                },]
+                                            }]
+
+                                        }}
+                                    />
                                 </Card.Body>
                             </Card>
                         </Col>
@@ -422,6 +552,9 @@ const Dashboard = ()=>{
                                     options={{
                                         chart: {
                                             type: 'column'
+                                        },
+                                        credits: {
+                                            enabled: false
                                         },
                                         title: {
                                             text: 'Transaction Volume by Date'
@@ -440,6 +573,7 @@ const Dashboard = ()=>{
                                             title: {
                                                 text: "Transactions",
                                             },
+                                            allowDecimals:false,
                                             opposite:true,
                                             labels: {
                                                 format: '{value}',
@@ -470,7 +604,7 @@ const Dashboard = ()=>{
                                             name: 'Transactions',
                                             data: state.transactionVolumeByDate.map((item)=>{return item?.transactionCount}),
                                             yAxis:1,
-                                        }]
+                                        }],
                                     }}
                                     />
                                 </Card.Body>
@@ -492,6 +626,9 @@ const Dashboard = ()=>{
                                         chart: {
                                             type: 'column'
                                         },
+                                        credits: {
+                                            enabled: false
+                                        },
                                         title: {
                                             text: 'Transaction Volume by Category'
                                         },
@@ -506,6 +643,7 @@ const Dashboard = ()=>{
                                             },
                                             
                                         },{
+                                            allowDecimals:false,
                                             title: {
                                                 text: "Transactions",
                                             },
