@@ -5,6 +5,7 @@ import Conversions from "../Pages/Conversions";
 import Dashboard from "../Pages/Dashboard";
 import Transactions from "../Pages/Transactions";
 import TopNav from "./TopNav";
+import FinAsset from "../Pages/FinAssets";
 
 const NavigationRouter = ()=>{
 
@@ -51,6 +52,11 @@ const NavigationRouter = ()=>{
                     component={<Link to="/v1/transactions" onClick={()=>{toggleSidebar(false)}}/>}> 
                         Transactions
                     </MenuItem>
+                    <MenuItem 
+                    active={window.location.pathname.includes("fin-assets")} 
+                    component={<Link to="/v1/fin-assets" onClick={()=>{toggleSidebar(false)}}/>}> 
+                        Financial Assets
+                    </MenuItem>
                 </Menu>
             </Sidebar>
 
@@ -59,6 +65,7 @@ const NavigationRouter = ()=>{
                 <Route path="/categories" element={<Categories/>}/>
                 <Route path="/conversions" element={<Conversions/>}/>
                 <Route path="/transactions" element={<Transactions/>}/>
+                <Route path="/fin-assets" element={<FinAsset/>}/>
             </Routes>
                 
         </>
