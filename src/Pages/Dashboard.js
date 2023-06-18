@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Card, Col, Container, Form, Offcanvas, Row } from "react-bootstrap"
 import DatePicker from "react-datepicker";
 import Select from "react-select";
-import { CONFIG, GET_CATGORIES, GET_FINASSETS, GET_TRANSACTIONS } from "../API";
+import { CONFIG, GET_ASSETS, GET_CATGORIES, GET_FINASSETS, GET_TRANSACTIONS } from "../API";
 import axios from "axios";
 import { errorHandler, get_YYYY_MM_DD } from "../UTILS/functions";
 import Highcharts from 'highcharts';
@@ -33,6 +33,8 @@ const Dashboard = ()=>{
         totalPortfolioAsset:0,
         totalPortfolioVolume:0,
 
+        financialAssetChartsData:[],
+
 
     });
 
@@ -44,6 +46,7 @@ const Dashboard = ()=>{
 
         getFinAssetKPIs();
         getPortfolioKPIs();
+        getAssetCharts();
     },[]);
 
     const toggleFilterby = ()=>{
@@ -216,6 +219,27 @@ const Dashboard = ()=>{
                 {
                     return {...prevState,
                         transactionVolumeByCategory:res?.data?.data?.data,
+                    };
+                }
+            );
+
+        })
+        .catch((err)=>{
+            errorHandler(err) 
+        })
+    }
+
+    const getAssetCharts = ()=>{
+        let url = new URL(`${GET_FINASSETS}/chart`)
+
+        CONFIG.headers.Authorization = "Bearer " + localStorage.getItem("token") 
+
+        axios.get(url,CONFIG)
+        .then((res)=>{
+            setState(prevState => 
+                {
+                    return {...prevState,
+                        financialAssetChartsData:res?.data?.data?.data,
                     };
                 }
             );
@@ -613,7 +637,73 @@ const Dashboard = ()=>{
                         <Col md="6">
                             <Card className="dashboard-cards m-1">
                                 <Card.Body>
-                                    Card 1
+                                <HighchartsReact
+                                    highcharts={Highcharts}
+                                    options={{
+                                        chart: {
+                                            type: 'column'
+                                        },
+                                        credits: {
+                                            enabled: false
+                                        },
+                                        title: {
+                                            text: 'Financial Assets'
+                                        },
+                                       
+                                        xAxis: {
+                                            categories: state.financialAssetChartsData.map((item)=>{return item?.categoryName}),
+                                            crosshair: true
+                                        },
+                                        yAxis: [{
+                                            title: {
+                                                text: "Volume"
+                                            },
+                                            
+                                        },{
+                                            allowDecimals:false,
+                                            title: {
+                                                text: "Transactions",
+                                            },
+                                            opposite:true,
+                                            labels: {
+                                                format: '{value}',
+                                                // Add the following line to display only full numbers without decimals
+                                                precision: 0
+                                              }
+                                        }],
+                                        tooltip: {
+                                            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                                            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                                                '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+                                            footerFormat: '</table>',
+                                            shared: true,
+                                            useHTML: true
+                                        },
+                                        plotOptions: {
+                                            column: {
+                                                pointPadding: 0.2,
+                                                borderWidth: 0
+                                            }
+                                        },
+                                        series: [{
+                                            name: 'Volume',
+                                            data: state.financialAssetChartsData.map((item)=>{return item?.totalVolume}),
+                                            yAxis:0,
+                                    
+                                        }, {
+                                            name: 'Transactions',
+                                            data: state.financialAssetChartsData.map((item)=>{return item?.transactionCount}),
+                                            yAxis:1,
+                                        },
+                                        {
+                                            name: 'Profit',
+                                            data: state.financialAssetChartsData.map((item)=>{return item?.totalProfit}),
+                                            yAxis:0,
+                                    
+                                        },
+                                    ]
+                                    }}
+                                    />
                                 </Card.Body>
                             </Card>
                         </Col>

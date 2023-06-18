@@ -6,6 +6,7 @@ import Dashboard from "../Pages/Dashboard";
 import Transactions from "../Pages/Transactions";
 import TopNav from "./TopNav";
 import FinAsset from "../Pages/FinAssets";
+import { Col, Row } from "react-bootstrap";
 
 const NavigationRouter = ()=>{
 
@@ -29,6 +30,17 @@ const NavigationRouter = ()=>{
                     },
                   }}
                 >
+                    <Col md="12" className="d-flex justify-content-center align-items-center my-2">
+                        <div className="image-container">
+
+                        </div>
+                    </Col>
+                    <Col md="12" className="d-flex justify-content-center align-items-center my-2">
+                        <h4>Welcome</h4>
+                    </Col>
+                    <Col md="12" className="d-flex justify-content-center align-items-center my-2">
+                        <h5>firstname lastname</h5>
+                    </Col>
                     <MenuItem 
                     active={window.location.pathname.includes("dashboard")} 
                     component={
@@ -42,11 +54,11 @@ const NavigationRouter = ()=>{
                     > 
                         Categories
                     </MenuItem>
-                    <MenuItem 
+                    {/* <MenuItem 
                     active={window.location.pathname.includes("conversions")} 
                     component={<Link to="/v1/conversions" onClick={()=>{toggleSidebar(false)}}/>}> 
                         Conversions
-                    </MenuItem>
+                    </MenuItem> */}
                     <MenuItem 
                     active={window.location.pathname.includes("transactions")} 
                     component={<Link to="/v1/transactions" onClick={()=>{toggleSidebar(false)}}/>}> 
@@ -63,7 +75,7 @@ const NavigationRouter = ()=>{
             <Routes>
                 <Route path="/dashboard" element={<Dashboard/>}/>
                 <Route path="/categories" element={<Categories/>}/>
-                <Route path="/conversions" element={<Conversions/>}/>
+                {/* <Route path="/conversions" element={<Conversions/>}/> */}
                 <Route path="/transactions" element={<Transactions/>}/>
                 <Route path="/fin-assets" element={<FinAsset/>}/>
             </Routes>
