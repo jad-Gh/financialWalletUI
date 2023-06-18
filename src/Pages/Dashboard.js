@@ -616,7 +616,10 @@ const Dashboard = ()=>{
                                         plotOptions: {
                                             column: {
                                                 pointPadding: 0.2,
-                                                borderWidth: 0
+                                                borderWidth: 0,
+                                                dataLabels: {
+                                                    enabled: true,
+                                                }
                                             }
                                         },
                                         series: [{
@@ -682,7 +685,10 @@ const Dashboard = ()=>{
                                         plotOptions: {
                                             column: {
                                                 pointPadding: 0.2,
-                                                borderWidth: 0
+                                                borderWidth: 0,
+                                                dataLabels: {
+                                                    enabled: true,
+                                                }
                                             }
                                         },
                                         series: [{
@@ -697,7 +703,7 @@ const Dashboard = ()=>{
                                         },
                                         {
                                             name: 'Profit',
-                                            data: state.financialAssetChartsData.map((item)=>{return item?.totalProfit}),
+                                            data: state.financialAssetChartsData.map((item)=>{return Number(item?.totalProfit.toFixed(2))}),
                                             yAxis:0,
                                     
                                         },
@@ -755,7 +761,10 @@ const Dashboard = ()=>{
                                         plotOptions: {
                                             column: {
                                                 pointPadding: 0.2,
-                                                borderWidth: 0
+                                                borderWidth: 0,
+                                                dataLabels: {
+                                                    enabled: true,
+                                                }
                                             }
                                         },
                                         series: [{
