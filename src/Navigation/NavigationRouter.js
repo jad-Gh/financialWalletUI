@@ -7,10 +7,38 @@ import Transactions from "../Pages/Transactions";
 import TopNav from "./TopNav";
 import FinAsset from "../Pages/FinAssets";
 import { Col, Row } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { CONFIG, GET_USER } from "../API";
+import axios from "axios";
+import { errorHandler } from "../UTILS/functions";
+import CategoryIcon from '@material-ui/icons/CategoryRounded';
+import DashboardIcon from '@material-ui/icons/DashboardOutlined';
+import Money from '@material-ui/icons/Payment';
+import Gold from '@material-ui/icons/House';
+import UserIcon from '@material-ui/icons/Person';
 
 const NavigationRouter = ()=>{
 
     const { collapseSidebar, toggleSidebar, collapsed, toggled, broken, rtl } = useProSidebar();
+    const [user,setUser] = useState({});
+
+    useEffect(()=>{
+        getUserInfo();
+    },[])
+
+    const getUserInfo = ()=>{
+        let url = new URL(GET_USER + "/info")
+
+        CONFIG.headers.Authorization = "Bearer " + localStorage.getItem("token") 
+
+        axios.get(url,CONFIG)
+        .then((res)=>{
+           setUser(res?.data?.data?.User)
+        })
+        .catch((err)=>{
+            errorHandler(err) 
+        })
+    }
 
 
     return (
@@ -39,10 +67,11 @@ const NavigationRouter = ()=>{
                         <h4>Welcome</h4>
                     </Col>
                     <Col md="12" className="d-flex justify-content-center align-items-center my-2">
-                        <h5>firstname lastname</h5>
+                        <h5>{user?.fullName}</h5>
                     </Col>
                     <MenuItem 
                     active={window.location.pathname.includes("dashboard")} 
+                    icon={<DashboardIcon/>}
                     component={
                     <Link to="/v1/dashboard" onClick={()=>{toggleSidebar(false)}}/>
                     }> 
@@ -50,6 +79,7 @@ const NavigationRouter = ()=>{
                     </MenuItem>
                     <MenuItem 
                     active={window.location.pathname.includes("categories")} 
+                    icon={<CategoryIcon/>}
                     component={<Link to="/v1/categories" onClick={()=>{toggleSidebar(false)}}/>}
                     > 
                         Categories
@@ -61,14 +91,22 @@ const NavigationRouter = ()=>{
                     </MenuItem> */}
                     <MenuItem 
                     active={window.location.pathname.includes("transactions")} 
+                    icon={<Money/>}
                     component={<Link to="/v1/transactions" onClick={()=>{toggleSidebar(false)}}/>}> 
                         Transactions
                     </MenuItem>
                     <MenuItem 
                     active={window.location.pathname.includes("fin-assets")} 
+                    icon={<Gold/>}
                     component={<Link to="/v1/fin-assets" onClick={()=>{toggleSidebar(false)}}/>}> 
                         Financial Assets
                     </MenuItem>
+                    {user?.roleName==="ROLE_ADMIN" && <MenuItem 
+                    active={window.location.pathname.includes("users")} 
+                    icon={<UserIcon/>}
+                    component={<Link to="/v1/users" onClick={()=>{toggleSidebar(false)}}/>}> 
+                        Users
+                    </MenuItem>}
                 </Menu>
             </Sidebar>
 

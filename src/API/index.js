@@ -18,3 +18,5 @@ export const GET_TRANSACTIONS = DEV_URL + "/transaction";
 export const GET_FINASSETS = DEV_URL + "/financial-asset";
 
 export const GET_ASSETS = DEV_URL + "/asset";
+
+export const GET_USER = DEV_URL + "/user";
