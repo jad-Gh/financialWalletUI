@@ -16,6 +16,7 @@ import DashboardIcon from '@material-ui/icons/DashboardOutlined';
 import Money from '@material-ui/icons/Payment';
 import Gold from '@material-ui/icons/House';
 import UserIcon from '@material-ui/icons/Person';
+import Users from "../Pages/Users";
 
 const NavigationRouter = ()=>{
 
@@ -116,6 +117,7 @@ const NavigationRouter = ()=>{
                 {/* <Route path="/conversions" element={<Conversions/>}/> */}
                 <Route path="/transactions" element={<Transactions/>}/>
                 <Route path="/fin-assets" element={<FinAsset/>}/>
+                {user?.roleName==="ROLE_ADMIN" && <Route path="/users" element={<Users/>}/>}
             </Routes>
                 
         </>
