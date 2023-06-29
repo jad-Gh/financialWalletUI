@@ -28,6 +28,7 @@ const Dashboard = ()=>{
 
         totalFinAssetVolume:0,
         totalFinAssetProfit:0,
+        totalFinAssetProfitReference:0,
 
         totalPortfolio:0,
         totalPortfolioAsset:0,
@@ -139,6 +140,7 @@ const Dashboard = ()=>{
                     return {...prevState,
                         totalFinAssetVolume:res?.data?.data?.data?.totalVolumeFormatted,
                         totalFinAssetProfit:res?.data?.data?.data?.totalProfitFormatted,
+                        totalFinAssetProfitReference:res?.data?.data?.data?.totalProfit,
                     };
                 }
             );
@@ -458,7 +460,7 @@ const Dashboard = ()=>{
                                         {state.totalFinAssetVolume} &nbsp;
 
                                         <span style={{fontSize:"13px"}}>
-                                            ({Number(state.totalFinAssetProfit) > 0 ? 
+                                            ({Number(state.totalFinAssetProfitReference) > 0 ? 
                                             <span className="text-success">
                                                 {state.totalFinAssetProfit}
                                             </span> 
