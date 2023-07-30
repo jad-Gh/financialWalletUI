@@ -223,5 +223,21 @@ border-color: $primary-color !important;
     border-radius: 50%;
 }
 
+.chat-room{
+    background-color: rgb(221, 219, 219);
+    .message-box{
+        display: flex;
+        justify-content: space-between;
+        padding: 20px 0px;
+
+        .send-btn{
+            height: 50px;
+            width: 150px;
+            margin-left: 15px;
+        }
+    }
+
+}
+
 
 

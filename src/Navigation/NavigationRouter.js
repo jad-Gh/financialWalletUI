@@ -16,7 +16,9 @@ import DashboardIcon from '@material-ui/icons/DashboardOutlined';
 import Money from '@material-ui/icons/Payment';
 import Gold from '@material-ui/icons/House';
 import UserIcon from '@material-ui/icons/Person';
+import ChatIcon from "@material-ui/icons/Forum";
 import Users from "../Pages/Users";
+import ChatRoom from "../Pages/ChatRoom";
 
 const NavigationRouter = ()=>{
 
@@ -108,6 +110,12 @@ const NavigationRouter = ()=>{
                     component={<Link to="/v1/users" onClick={()=>{toggleSidebar(false)}}/>}> 
                         Users
                     </MenuItem>}
+                    <MenuItem 
+                    active={window.location.pathname.includes("chat-room")} 
+                    icon={<ChatIcon/>}
+                    component={<Link to="/v1/chat-room" onClick={()=>{toggleSidebar(false)}}/>}> 
+                        Chat Room
+                    </MenuItem>
                 </Menu>
             </Sidebar>
 
@@ -117,6 +125,7 @@ const NavigationRouter = ()=>{
                 {/* <Route path="/conversions" element={<Conversions/>}/> */}
                 <Route path="/transactions" element={<Transactions/>}/>
                 <Route path="/fin-assets" element={<FinAsset/>}/>
+                <Route path="/chat-room" element={<ChatRoom/>}/>
                 {user?.roleName==="ROLE_ADMIN" && <Route path="/users" element={<Users/>}/>}
             </Routes>
                 
