@@ -107,11 +107,15 @@ const FinAsset = ()=>{
 
     const refreshGold = ()=>{
         setState(prevState => {return {...prevState,loading:true,};});
-        let url = new URL(`${GET_ASSETS}/gold-price/1`)
+
+        let reqArray = state.assetList.map((item)=>{
+            return  new URL(`${GET_ASSETS}/gold-price/${item?.value}`)
+        })
+        
 
         CONFIG.headers.Authorization = "Bearer " + localStorage.getItem("token") 
 
-        axios.get(url,CONFIG)
+        Promise.all(reqArray.map((item)=>axios.get(item,CONFIG)))
         .then((res)=>{
             setState(prevState => 
                 {
